@@ -1,0 +1,195 @@
+@import "react-toastify/dist/ReactToastify.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Dana";
+    /* 400 */
+    src: local(DanaFaNum-Regular),
+      url(../../public/fonts/Dana/DanaFaNum-Regular.woff2) format(woff2);
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Dana Medium";
+    /* 500 */
+    src: local(DanaFaNum-Medium),
+      url(../../public/fonts/Dana/DanaFaNum-Medium.woff2) format(woff2);
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Dana DemiBold";
+    /* 600 */
+    src: local(DanaFaNum-DemiBold),
+      url(../../public/fonts/Dana/DanaFaNum-DemiBold.woff2) format(woff2);
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Morabba Light";
+    /* 400 */
+    src: local(Morabba-Light),
+      url(../../public/fonts/Morabba/Morabba-Light.woff2) format(woff2);
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Morabba Medium";
+    /* 500 */
+    src: local(Morabba-Medium),
+      url(../../public/fonts/Morabba/Morabba-Medium.woff2) format(woff2);
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Morabba Bold";
+    /* 600 */
+    src: local(Morabba-Bold),
+      url(../../public/fonts/Morabba/Morabba-Bold.woff2) format(woff2);
+    font-display: swap;
+  }
+}
+
+@layer components {
+  .h-calc-page {
+    min-height: calc(100vh - 320px);
+  }
+
+  .alert {
+    @apply invisible opacity-0 fixed inset-0 m-auto p-5 md:p-10 text-sm md:text-base lg:text-lg shadow-normal rounded-2xl text-gray-700 dark:text-white bg-white dark:bg-zinc-700 transition-all z-30;
+  }
+
+  /*** overlay ***/
+  .overlay {
+    @apply fixed md:hidden inset-0 w-full h-full bg-black/60 transition-all z-10;
+  }
+
+  .overlay-alert {
+    @apply fixed inset-0 w-full h-full bg-black/90 transition-all z-20;
+  }
+
+  .overlay-alert--visible {
+    @apply visible opacity-100;
+  }
+
+  .alert-survey--visible {
+    @apply visible opacity-100;
+  }
+
+  .alert-login {
+    @apply alert w-[70%] h-[320px] md:w-[550px] md:h-[420px];
+  }
+
+  .alert-login--visible {
+    @apply visible opacity-100;
+  }
+
+  .alert-code {
+    @apply alert w-[70%] h-[350px] md:w-[550px] md:h-[420px];
+  }
+
+  .alert-code--visible {
+    @apply visible opacity-100;
+  }
+
+  .alert-name {
+    @apply alert w-[70%] h-[340px] md:w-[550px] md:h-[420px];
+  }
+
+  .alert-name--visible {
+    @apply visible opacity-100;
+  }
+
+  /* Cart Product */
+  .alert-survey {
+    @apply alert w-[90%] h-[400px] md:h-[550px] lg:w-[800px] lg:h-[550px];
+  }
+
+  .alert-picture {
+    @apply alert w-[350px] h-[370px] sm:w-[400px] md:w-[500px] md:h-[420px] lg:w-[800px] lg:h-[550px];
+  }
+
+  .alert-save {
+    @apply fixed left-2.5 flex items-center justify-center bg-orange-400 text-white text-sm md:text-base lg:text-lg p-4 rounded-xl transition-all delay-75 z-50;
+  }
+
+  .submenu {
+    @apply hidden flex-col gap-y-3 pr-7 mt-3 text-sm text-zinc-600 dark:text-white;
+  }
+
+  .submenu--open {
+    @apply flex;
+  }
+
+  .submenu__item--active {
+    @apply relative text-orange-300 pr-2.5;
+  }
+
+  .submenu__item--active::after {
+    content: "";
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 100px;
+    background-color: #fdba74;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+
+  .section-title {
+    @apply font-MorabbaMedium text-zinc-700 dark:text-white text-2xl/8 lg:text-5xl/[3rem];
+  }
+
+  .section-subtitle {
+    @apply font-MorabbaLight text-zinc-700 dark:text-white text-xl/8 lg:text-3xl/[3rem];
+  }
+
+  .section-link {
+    @apply flex items-center text-base text-orange-300 tracking-tightest lg:text-xl min-h-12;
+  }
+
+  /* 1280 */
+  /* html.dark .products {
+    background-image: url("/image/background/body-bg.png");
+  }
+
+  .products {
+    background: linear-gradient(
+        rgba(243, 244, 246, 0.85),
+        rgba(243, 244, 246, 0.85)
+      ),
+      url("/image/background/body-bg.png");
+
+    background-size: 100%;
+    width: 100%;
+  } */
+
+  /* html.dark .background {
+    background-image: url("/image/background/body-bg.png");
+  }
+
+  .background {
+    background: linear-gradient(
+        rgba(243, 244, 246, 0.9),
+        rgba(243, 244, 246, 0.9)
+      ),
+      url("/image/background/body-bg.png");
+
+    background-size: 100%;
+    background-repeat: repeat-y;
+    width: 100%;
+  } */
+}
+
+.Toastify__toast-body {
+  font-family: "Dana", Courier, monospace;
+  direction: rtl;
+  color: #fdba74;
+}
