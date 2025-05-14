@@ -59,7 +59,7 @@ export const SessionProvider = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center w-screen h-screen background">
+      <div className="flex items-center justify-center w-screen min-h-screen background">
         <div className="flex items-center justify-center gap-x-1">
           <h1 className="font-MorabbaBold text-lg md:text-xl lg:text-2xl text-orange-500">
             <span>منتظر بمانید</span>

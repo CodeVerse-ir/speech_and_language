@@ -270,7 +270,7 @@ const NameAndMobileForm: React.FC<FullNameFormProps> = ({
       <div className="flex items-center justify-center gap-x-1.5 text-center text-zinc-700 dark:text-gray-300">
         <div>اگر حساب کاربری دارید،</div>
         <Link
-          href="/auth/login"
+          href="/"
           className="text-orange-400 dark:text-orange-300"
         >
           وارد شوید.

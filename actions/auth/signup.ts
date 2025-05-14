@@ -243,6 +243,9 @@ async function usernameAndPassword(
     );
 
     let user_id = null;
+    const otpCode = generateRandomOTP();
+
+    console.log("create random otp code : ", otpCode);
 
     if (inactiveUsers.length > 0) {
       await db.query(
@@ -268,7 +271,7 @@ async function usernameAndPassword(
           hashedPassword,
           now,
           false,
-          generateRandomOTP(),
+          otpCode,
           twoMinutesLater,
           now,
           inactiveUsers[0].id,
@@ -299,12 +302,41 @@ async function usernameAndPassword(
           hashedPassword,
           now,
           false,
-          generateRandomOTP(),
+          otpCode,
           twoMinutesLater,
         ]
       );
 
       user_id = result.insertId;
+    }
+
+    const res = await fetch("https://sms.ictx.ir/api/rest/sms/send", {
+      cache: "no-store",
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        SmsSender: `${otpCode}`,
+        Mobile: `${mobile_number}`,
+        Message: `کد تایید شما: ${otpCode}\nلطفاً این کد را در اختیار دیگران قرار ندهید.`,
+        Authentication: {
+          Username: "",
+          AuthKey: `${process.env.SMS_AUTH_KEY}`,
+        },
+      }),
+    });
+
+    const data = await res.json();
+    console.log("postFetch : ", data);
+
+    if (data.Status.Code !== 200) {
+      return {
+        ...prevState,
+        status: "error",
+        message: "خطا در هنگام ارسال کد احراز هویت",
+      };
     }
 
     console.log("user_id : ", user_id);
@@ -343,7 +375,7 @@ async function usernameAndPassword(
       };
     }
   } catch (error) {
-    console.error("خطا در هنگام ورود:", error);
+    console.error("خطا در هنگام ارسال کد احراز هویت :", error);
 
     return {
       ...prevState,

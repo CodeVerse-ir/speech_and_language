@@ -30,6 +30,7 @@ interface checkOtpProps {
 
 interface resendOtpProps {
   status: string | null;
+  message: string;
 }
 
 interface meProps {
@@ -101,7 +102,7 @@ async function login(
     const hashedPassword = createHash(password);
 
     const users = await db.query(
-      "SELECT id FROM users WHERE username = ? AND password = ? AND active = ?",
+      "SELECT id, mobile_number FROM users WHERE username = ? AND password = ? AND active = ?",
       [username, hashedPassword, true]
     );
 
@@ -122,6 +123,36 @@ async function login(
     );
 
     if (result.affectedRows === 1) {
+      const res = await fetch("https://sms.ictx.ir/api/rest/sms/send", {
+        cache: "no-store",
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          SmsSender: `${otpCode}`,
+          Mobile: `${users[0].mobile_number}`,
+          Message: `کد تایید شما: ${otpCode}\nلطفاً این کد را در اختیار دیگران قرار ندهید.`,
+          Authentication: {
+            Username: "",
+            AuthKey: `${process.env.SMS_AUTH_KEY}`,
+          },
+        }),
+      });
+
+      const data = await res.json();
+      console.log("postFetch : ", data);
+
+      if (data.Status.Code !== 200) {
+        return {
+          ...prevState,
+          status: "error",
+          message: "خطا در هنگام ارسال کد احراز هویت",
+        };
+      }
+
+      // create jwt
       const payload = {
         user_id,
         created_at: now,
@@ -279,17 +310,63 @@ async function resendOtp(): Promise<resendOtpProps> {
   const login_token = cookieStore.get("login_token");
 
   if (!login_token) {
-    return { status: "error" };
+    return {
+      status: "error",
+      message: "زمان شما به اتمام رسیده است ، لطفا مجدد وارد شوید.",
+    };
   }
 
   try {
     const decodedToken = decodeJWT(login_token.value);
     if (!decodedToken?.user_id) {
-      return { status: "error" };
+      return {
+        status: "error",
+        message: "کاربر یافت نشد ، لطفا مجدد وارد شوید.",
+      };
+    }
+
+    const users = await db.query(
+      "SELECT mobile_number FROM users WHERE id = ?",
+      [decodedToken.user_id]
+    );
+
+    if (users.length === 0) {
+      return {
+        status: "error",
+        message: "کاربر یافت نشد ، لطفا مجدد وارد شوید.",
+      };
     }
 
     const newOtp = generateRandomOTP();
     const expiryTime = new Date(Date.now() + 2 * 60000);
+
+    const res = await fetch("https://sms.ictx.ir/api/rest/sms/send", {
+      cache: "no-store",
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        SmsSender: `${newOtp}`,
+        Mobile: `${users[0].mobile_number}`,
+        Message: `کد تایید شما: ${newOtp}\nلطفاً این کد را در اختیار دیگران قرار ندهید.`,
+        Authentication: {
+          Username: "",
+          AuthKey: `${process.env.SMS_AUTH_KEY}`,
+        },
+      }),
+    });
+
+    const data = await res.json();
+    console.log("postFetch : ", data);
+
+    if (data.Status.Code !== 200) {
+      return {
+        status: "error",
+        message: "خطا در هنگام ارسال کد احراز هویت",
+      };
+    }
 
     const result = await db.query(
       "UPDATE users SET otp_code = ?, otp_validity_time = ? WHERE id = ?",
@@ -297,11 +374,11 @@ async function resendOtp(): Promise<resendOtpProps> {
     );
 
     return result.affectedRows === 1
-      ? { status: "success" }
-      : { status: "error" };
+      ? { status: "success", message: "کد احراز هویت برای شما ارسال شد." }
+      : { status: "error", message: "خطا در هنگام ارسال کد احراز هویت" };
   } catch (error) {
-    console.error("خطا در ارسال مجدد کد:", error);
-    return { status: "error" };
+    console.error("error in resendOtp : ", error);
+    return { status: "error", message: "خطا در ارسال مجدد کد:" };
   }
 }
 
@@ -345,7 +422,6 @@ async function me(): Promise<meProps> {
         }
       }
 
-      // بررسی مجدد کوکی و حذف آن در صورت وجود
       const hasCookie = cookieStore.has("token");
       if (hasCookie) {
         cookieStore.delete("token");
