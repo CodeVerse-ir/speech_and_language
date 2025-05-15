@@ -131,7 +131,7 @@ async function login(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          SmsSender: `${otpCode}`,
+          SmsSender: `${process.env.SMS_SENDER_NUMBER}`,
           Mobile: `${users[0].mobile_number}`,
           Message: `کد تایید شما: ${otpCode}\nلطفاً این کد را در اختیار دیگران قرار ندهید.`,
           Authentication: {
@@ -348,7 +348,7 @@ async function resendOtp(): Promise<resendOtpProps> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        SmsSender: `${newOtp}`,
+        SmsSender: `${process.env.SMS_SENDER_NUMBER}`,
         Mobile: `${users[0].mobile_number}`,
         Message: `کد تایید شما: ${newOtp}\nلطفاً این کد را در اختیار دیگران قرار ندهید.`,
         Authentication: {
